@@ -1,115 +1,88 @@
-type Query{
-    customers:[CustomerDto]
-    customerByIdentity(identity:String):CustomerDto
-    bankAccounts : [BankAccountDto]
-    bankAccountByRib (rib:String):BankAccountDto
-    getTransactions (dto:GetTransactionListRequest):[TransactionDto]
+type Query {
+  customers: [CustomerDTO]
+  customerByIdentity(identityRef: String!): CustomerDTO
+
+  bankAccounts: [BankAccountDTO]
+  bankAccountByRib(rib: String!): BankAccountDTO
 }
 
 type Mutation {
-    createCustomer(dto:AddCustomerRequest):AddCustomerResponse
-    addBankAccount(dto:AddBankAccountRequest):AddBankAccountResponse
-    addWirerTransfer(dto:AddWirerTransferRequest):AddWiredTransferResponse
-    updateCustomer(identityRef:String,dto:UpdateCustomerRequest):UpdateCustomerResponse
-    deleteCustomer(identityRef:String):String
+  createCustomer(dto: AddCustomerInput!): AddCustomerResponse
+  updateCustomer(identityRef: String!, dto: UpdateCustomerInput!): UpdateCustomerResponse
+  deleteCustomer(identityRef: String!): String
+
+  addBankAccount(dto: AddBankAccountInput!): AddBankAccountResponse
+  addWirerTransfer(dto: AddWirerTransferInput!): AddWirerTransferResponse
 }
 
-type CustomerDto {
-    username : String,
-    identityRef : String,
-    firstname:String,
-    lastname:String,
+type CustomerDTO {
+  id: ID
+  username: String
+  identityRef: String
+  firstname: String
+  lastname: String
 }
 
-type BankAccountDto {
-    rib:String,
-    amount:Float,
-    createdAt:String,
-    accountStatus:AccountStatus,
-    customer:CustomerDto,
+type BankAccountDTO {
+  id: ID
+  rib: String
+  amount: Float
+  createdAt: String
+  accountStatus: String
+  customerIdentityRef: String
 }
 
-type TransactionDto {
-    createdAt:String,
-    transactionType:TransactionType,
-    amount:Float,
-    bankAccount:BankAccountDto
-    user:userDto
+type TransactionDTO {
+  createdAt: String
+  transactionType: String
+  amount: Float
+  rib: String
+  username: String
 }
 
-type userDto {
-    username:String
-    firstname:String
-    lastname:String
-}
-
-enum AccountStatus {
-    OPENED, CLOSED, BLOCKED
-}
-enum TransactionType {
-    CREDIT,DEBIT
-}
-
-input AddCustomerRequest {
-    username : String,
-    identityRef : String,
-    firstname:String,
-    lastname:String
-}
-
-input UpdateCustomerRequest {
-    username : String,
-    firstname:String,
-    lastname:String
-}
-
-type UpdateCustomerResponse {
-    id:Int,
-    message:String,
-    username:String,
-    identityRef:String,
-    firstname:String,
-    lastname:String
+input AddCustomerInput {
+  username: String!
+  identityRef: String!
+  firstname: String!
+  lastname: String!
 }
 
 type AddCustomerResponse {
-    message:String,
-    username:String,
-    identityRef:String,
-    firstname:String,
-    lastname:String
+  message: String
+  customer: CustomerDTO
 }
 
-input AddBankAccountRequest {
-    rib:String,
-    amount:Float,
-    customerIdentityRef:String
+input UpdateCustomerInput {
+  username: String!
+  firstname: String!
+  lastname: String!
+}
+
+type UpdateCustomerResponse {
+  message: String
+  customer: CustomerDTO
+}
+
+input AddBankAccountInput {
+  rib: String!
+  amount: Float!
+  customerIdentityRef: String!
 }
 
 type AddBankAccountResponse {
-    message:String,
-    rib:String,
-    amount:Float,
-    createdAt:String,
-    accountStatus:AccountStatus,
-    customer:CustomerDto
+  message: String
+  bankAccount: BankAccountDTO
 }
 
-input AddWirerTransferRequest {
-    ribFrom:String,
-    ribTo:String,
-    amount:Float,
-    username:String
+input AddWirerTransferInput {
+  ribFrom: String!
+  ribTo: String!
+  amount: Float!
+  username: String!
 }
 
-type AddWiredTransferResponse {
-    message:String,
-    transactionFrom:TransactionDto,
-    transactionTo:TransactionDto
-}
-
-input GetTransactionListRequest {
-    rib:String,
-    dateTo : String,
-    dateFrom:String
+type AddWirerTransferResponse {
+  message: String
+  transactionFrom: TransactionDTO
+  transactionTo: TransactionDTO
 }
