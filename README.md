@@ -212,7 +212,7 @@ bank-service-multi-connector-jwt/
 ✅ IntelliJ IDEA (Ultimate) <br/>
 ✅ Git <br/>
 
-### #️⃣ Lancer l’application <br/>
+### 2️⃣ Lancer l’application <br/>
 
 **_Depuis IntelliJ IDEA :_** <br/>
 
