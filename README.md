@@ -267,7 +267,7 @@ BankServiceMultiConnectorApplication.java
 
 Anas KRIR & Adam EL YOURI <br/>
 Étudiants Ingénieurs — MIAGE <br/>
-TP réalisé dans le cadre du module J2EE / Middleware <br/>
+TP réalisé dans le cadre du module ARCHITECTURE DES COMPOSANTS D'ENTREPRISES <br/>
 
 Technologies : <br/>
 Java · Spring Boot · REST · GraphQL · SOAP · gRPC · Protocol Buffers · Maven <br/>
