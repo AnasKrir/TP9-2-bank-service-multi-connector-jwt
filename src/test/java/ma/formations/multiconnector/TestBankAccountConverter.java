@@ -1,5 +1,6 @@
 package ma.formations.multiconnector;
 
+import ma.formations.multiconnector.domain.BankAccount;
 import ma.formations.multiconnector.dtos.bankaccount.AddBankAccountRequest;
 import org.junit.jupiter.api.Test;
 import org.modelmapper.ModelMapper;

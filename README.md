@@ -1,7 +1,8 @@
-# TP 7 — Web Service Multi-Connecteur (REST, GraphQL, SOAP & gRPC)
+# TP 9 — Web Service Multi-Connecteur Sécurisé (Spring Security & JWT)
 
 ![Java](https://img.shields.io/badge/Java-17-orange)
 ![Spring Boot](https://img.shields.io/badge/Spring%20Boot-3.x-brightgreen)
+![Spring Security](https://img.shields.io/badge/Spring%20Security-JWT-success)
 ![REST](https://img.shields.io/badge/REST-HTTP%2FJSON-blue)
 ![GraphQL](https://img.shields.io/badge/GraphQL-API-pink)
 ![SOAP](https://img.shields.io/badge/SOAP-WSDL-lightgrey)
@@ -10,11 +11,11 @@
 ![Status](https://img.shields.io/badge/Status-Working-success)
 ![License](https://img.shields.io/badge/License-MIT-blue.svg)
 
-Projet du **TP 7 – Web Service Multi-Connecteur**.  
-Ce TP a pour objectif de **concevoir un même service métier exposé via plusieurs technologies de communication**, en utilisant **Spring Boot**.
+Projet du **TP 9 – Web Service Multi-Connecteur Sécurisé**.  
+Ce TP est une **évolution du TP7**, avec l’intégration complète de **Spring Security + JWT** afin de sécuriser l’accès aux services exposés.
 
 Les connecteurs implémentés sont :
-- **REST**
+- **REST sécurisé (JWT + rôles & permissions)**
 - **GraphQL**
 - **SOAP**
 - **gRPC**
@@ -27,51 +28,55 @@ Les connecteurs implémentés sont :
 2. [Concepts clés](#-concepts-clés)
 3. [Stack technique](#-stack-technique)
 4. [Architecture du projet](#-architecture-du-projet)
-5. [Services exposés](#-services-exposés)
-6. [Démarrage rapide](#-démarrage-rapide)
-7. [Tests & démonstrations](#-tests--démonstrations)
-8. [Remarques importantes](#-remarques-importantes)
-9. [Auteurs](#-auteurs)
-10. [Licence](#-licence)
+5. [Sécurité & Authentification](#-sécurité--authentification)
+6. [Services exposés](#-services-exposés)
+7. [Démarrage rapide](#-démarrage-rapide)
+8. [Tests & démonstrations](#-tests--démonstrations)
+9. [Remarques importantes](#-remarques-importantes)
+10. [Auteurs](#-auteurs)
+11. [Licence](#-licence)
 
 ---
 
 ## 🎯 Objectifs du TP
 
-- Comprendre le principe des **Web Services**
-- Implémenter une **architecture multi-connecteur**
-- Exposer un même service métier via :
-    - REST (HTTP / JSON)
-    - GraphQL
-    - SOAP (WSDL)
-    - gRPC (HTTP/2 + Protocol Buffers)
-- Tester chaque connecteur avec des outils adaptés
-- Comparer les différents styles de communication
+- Comprendre le fonctionnement de **Spring Security**
+- Mettre en place une **authentification JWT**
+- Gérer les **rôles et permissions**
+- Sécuriser les endpoints REST
+- Conserver une **architecture multi-connecteur**
+- Tester les accès autorisés et refusés
 
 ---
 
 ## 🧠 Concepts clés
 
-### 🔹 REST
-- Basé sur HTTP
-- Représentation JSON
-- Documentation via **OpenAPI / Swagger**
+### 🔹 JWT (JSON Web Token) <br/>
+- Authentification **stateless** <br/>
+- Token signé et vérifié à chaque requête <br/>
+- Transmission via header `Authorization: Bearer <token>` <br/>
 
-### 🔹 GraphQL
-- Un seul endpoint `/graphql`
-- Requêtes flexibles
-- Récupération ciblée des données
+### 🔹 Spring Security <br/>
+- Filtre de sécurité personnalisé  <br/>
+- Gestion des rôles et permissions <br/>
+- Protection fine des endpoints <br/>
+
+### 🔹 REST
+- Basé sur HTTP <br/>
+- Représentation JSON <br/>
+- Sécurisé par JWT <br/>
+
+### 🔹 GraphQL <br/>
+- Endpoint unique `/graphql` <br/>
+- Requêtes flexibles <br/>
 
 ### 🔹 SOAP
-- Basé sur XML
-- Contrat formel via **WSDL**
-- Très utilisé dans les systèmes bancaires et legacy
+- Basé sur XML <br/>
+- Contrat formel via WSDL <br/>
 
 ### 🔹 gRPC
-- RPC moderne basé sur **HTTP/2**
-- Sérialisation binaire (**Protocol Buffers**)
-- Très performant
-- Non accessible via navigateur
+- RPC moderne basé sur HTTP/2 <br/>
+- Sérialisation binaire (Protocol Buffers) <br/>
 
 ---
 
@@ -81,11 +86,12 @@ Les connecteurs implémentés sont :
 |------------|---------|
 | Java | 17 |
 | Spring Boot | 3.x |
+| Spring Security | JWT |
 | REST | Spring Web |
 | GraphQL | Spring GraphQL |
 | SOAP | Spring WS |
 | gRPC | grpc-spring-boot-starter |
-| Protocol Buffers | 3.x |
+| H2 Database | In-Memory |
 | Maven | ✅ |
 | IntelliJ IDEA | Ultimate |
 | OS | macOS |
@@ -95,12 +101,14 @@ Les connecteurs implémentés sont :
 ## 🏗️ Architecture du projet
 
 ```
-bank-service-multi-connector/
+bank-service-multi-connector-jwt/
 ├── src/main/java/ma/formations/multiconnector/
 │ ├── config/
 │ ├── dao/
 │ ├── domain/
 │ ├── dtos/
+│ ├── jwt/
+│ ├── security/
 │ ├── service/
 │ ├── presentation/
 │ │ ├── rest/
@@ -114,65 +122,97 @@ bank-service-multi-connector/
 │ ├── bank.proto
 │ └── graphql/
 │
+├── docs/
+│ ├── 1.png
+│ ├── 2.png
+│ ├── 3.png
+│ └── 4.png
+| └── 5.png
+| └── 6.png
+│
 ├── pom.xml
 └── README.md
 ```
 
 
+---
+
+## 🔐 Sécurité & Authentification <br/>
+
+### 🔑 Authentification <br/>
+
+**_Endpoint :_**
+
+- POST /auth/signin <br/>
+
+- Payload : <br/>
+
+```
+{
+  "username": "agentguichet",
+  "password": "agentguichet"
+}
+```
+
+**_Réponse :_** <br/>
+
+- JWT Token <br/>
+- Rôles et permissions associées <br/>
+
+#### **_🛡️ Autorisation_**
+
+- Accès contrôlé par rôles & permissions <br/>
+- Exemple : <br/>
+- ROLE_AGENT_GUICHET → accès autorisé  <br/>
+- ROLE_CLIENT → accès refusé (500) <br/>
 
 ---
 
-## 🧩 Services exposés
+## 🧩 Services exposés <br/>
 
-### 🟦 REST
-- Gestion des clients
-- Gestion des comptes bancaires
-- Gestion des transactions
+### 🟦 REST (Sécurisé) <br/>
+
+- Gestion des clients <br/>
+- Gestion des comptes bancaires <br/>
+- Gestion des transactions <br/>
+- Accès protégé par JWT <br/>
 
 ### 🟪 GraphQL
-- Query `customers`
-- Query `customerByIdentity`
-- Mutations de création et modification
+
+- Query customers <br/>
+- Query customerByIdentity <br/>
+- Mutations CRUD <br/>
 
 ### 🟧 SOAP
-- Service `BankService`
-- WSDL généré automatiquement
-- Méthodes : customers, createCustomer, createBankAccount, transactions…
 
-### 🟩 gRPC
-- Service `BankService`
-- Méthodes unary :
-    - customers
-    - customerByIdentity
-    - bankAccounts
-    - addBankAccount
-    - addWirerTransfer
-    - getTransactions
+- Service BankService <br/>
+- WSDL généré automatiquement <br/>
+
+### 🟩 gRPC <br/>
+
+- Service BankService <br/>
+
+**_Méthodes :_** <br/>
+
+- customers <br/>
+- customerByIdentity <br/>
+- bankAccounts <br/>
+- addBankAccount <br/>
+- addWireTransfer <br/>
+- getTransactions <br/>
 
 ---
 
-## 🚀 Démarrage rapide
+## 🚀 Démarrage rapide <br/>
 
-### 1️⃣ Prérequis
+### 1️⃣ Prérequis <br/>
 
-✅ Java 17  <br/>
-✅ Maven   <br/>
-✅ IntelliJ IDEA (Ultimate)   <br/>
+✅ Java 17 <br/>
+✅ Maven <br/>
+✅ IntelliJ IDEA (Ultimate) <br/>
 ✅ Git <br/>
 
-### 2️⃣ Cloner le projet
-
-```
-git clone https://github.com/AnasKrir/TP7-bank-service-multi-connector.git
-cd bank-service-multi-connector
-```
-
-### 3️⃣ Générer les stubs gRPC
-```
-mvn clean install
-```
-
-### 4️⃣ Lancer l’application
+### #️⃣ Lancer l’application <br/>
 
 **_Depuis IntelliJ IDEA :_** <br/>
 
@@ -180,86 +220,65 @@ mvn clean install
 BankServiceMultiConnectorApplication.java
 ```
 
-**_Ports utilisés :_**
+### 3️⃣ Accès H2 <br/>
 
-- REST / GraphQL / SOAP : http://localhost:8080 <br/>
-- gRPC : localhost:4444 <br/>
+**_URL :_** <br/>
+
+#### 👉🏻 http://localhost:8080/h2 <br/>
+
+**_JDBC URL :_** <br/>
+
+- jdbc:h2:mem:bank_db <br/>
+- User : sa <br/>
+- Password : (vide) <br/>
 
 ---
 
-
-## 🔗 Tests & démonstrations
-
-### 🔹 REST — Swagger UI
-
-- URL : <br/>
-
-#### 👉🏻 http://localhost:8080/api/rest/swagger-ui/index.html
-
-| Swagger REST      |
-|-------------------|
-| ![](docs/1.png)   |
-| ![](docs/3.png)   |
-| ![](docs/3.1.png) |
+## 🔗 Tests & démonstrations <br/>
 
 
-### 🔹 GraphQL — Test via Postman
+### 🟢 H2 Database <br/>
 
-- Endpoint : <br/>
+#### ✅ Connexion réussi <br/>
 
-#### 👉🏻 POST http://localhost:8080/graphql <br/>
+| H2 Database     |
+|-----------------|
+| ![](docs/1.png) |
+| ![](docs/2.png) |
 
-- Query : <br/>
+### 🔐 Authentification JWT (Postman) <br/>
+
+#### ✅ Accès autorisé (ROLE_AGENT_GUICHET) <br/>
+
 ```
-{
-"query": "query { customers { identityRef firstname lastname username } }"
-}
+GET http://localhost:8080/api/rest/customer/agent_guichet/all
+Authorization: Bearer <JWT>
 ```
 
-| GraphQL Test      |
-| ----------------- |
-| ![](docs/2.png)   |
-| ![](docs/2.1.png) |
+| Authentification JWT (Postman) | Accès autorisé    |
+|--------------------------------| ----------------|
+| ![](docs/3.png)                |![](docs/4.png) |
 
-### 🔹 SOAP — WSDL <br/>
 
-- URL : <br/>
 
-#### 👉🏻 http://localhost:8080/api/soap/BankService?wsdl <br/>
+### ❌ Accès refusé (ROLE_CLIENT → 500) <br/>
 
-| SOAP WSDL       |
+#### Même endpoint avec un utilisateur client. <br/>
+
+| Accès refusé    |
 |-----------------|
 | ![](docs/5.png) |
-
-
-### 🔹 gRPC — Test via Postman gRPC
-
-- Host : localhost  <br/>
-- Port : 4444  <br/>
-- Proto : bank.proto  <br/>
-- Service : BankService <br/>
-```
-{
-"identityRef": "A100"
-}
-```
-
-| gRPC Test       |
-| --------------- |
-| ![](docs/4.png) |
 | ![](docs/6.png) |
-
-#### ⚠️ Le port gRPC n’est pas accessible via navigateur (comportement normal). <br/>
 
 ---
 
 ## ⚠️ Remarques importantes <br/>
 
-- Le même service métier est exposé via 4 technologies différentes <br/>
-- gRPC utilise HTTP/2 + Protobuf <br/>
-- SOAP repose sur un contrat WSDL <br/>
-- GraphQL fonctionne via un endpoint unique <br/>
-- REST est documenté via Swagger / OpenAPI <br/>
+- Sécurité stateless (JWT) <br/>
+- Aucun stockage de session <br/>
+- H2 en mémoire pour les tests  <br/>
+- REST sécurisé, autres connecteurs conservés <br/>
+- Architecture claire et modulaire  <br/>
 
 ---
 
@@ -267,19 +286,20 @@ BankServiceMultiConnectorApplication.java
 
 Anas KRIR & Adam EL YOURI <br/>
 Étudiants Ingénieurs — MIAGE <br/>
-TP réalisé dans le cadre du module ARCHITECTURE DES COMPOSANTS D'ENTREPRISES <br/>
+
+TP réalisé dans le cadre du module : ARCHITECTURE DES COMPOSANTS D’ENTREPRISES <br/>
 
 Technologies : <br/>
-Java · Spring Boot · REST · GraphQL · SOAP · gRPC · Protocol Buffers · Maven <br/>
+Java · Spring Boot · Spring Security · JWT · REST · GraphQL · SOAP · gRPC · Maven <br/>
+
 
 ---
 
 ## 📄 Licence
 
-✅ Projet sous licence MIT <br/>
-Libre d’utilisation, modification et distribution à des fins pédagogiques. <br/>
+Projet sous licence MIT<br/>
+✅ Libre d’utilisation à des fins pédagogiques. <br/>
 
 © 2025 — Anas KRIR & Adam EL YOURI <br/>
 
 ---
-
