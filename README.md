@@ -297,8 +297,8 @@ Java · Spring Boot · Spring Security · JWT · REST · GraphQL · SOAP · gRPC
 
 ## 📄 Licence
 
-Projet sous licence MIT<br/>
-✅ Libre d’utilisation à des fins pédagogiques. <br/>
+✅ Projet sous licence MIT<br/>
+Libre d’utilisation à des fins pédagogiques. <br/>
 
 © 2025 — Anas KRIR & Adam EL YOURI <br/>
 
